@@ -3,152 +3,267 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WIENER DOGE 🐶</title>
+  <title>WIENER DOGE</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root{--purple:#8a2be2;--gold:#ffd700;--pup:#8b4513;--bg:#0a0a0a;}
-    body{margin:0;background:linear-gradient(135deg,#1a0033,#000);color:#fff;font-family:'Comic Sans MS',sans-serif;text-align:center;overflow:hidden;position:relative;}
-    .stars{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
-    .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s infinite;}
-    @keyframes twinkle{0%,100%{opacity:0.4;transform:scale(1);}50%{opacity:1;transform:scale(1.3);}}
-    h1{font-size:28px;margin:10px 0;text-shadow:0 0 20px var(--purple);letter-spacing:2px;}
-    .stats{display:flex;justify-content:space-around;font-size:20px;margin:10px 0;}
-    .stat{background:rgba(255,255,255,0.1);padding:8px 12px;border-radius:15px;}
-    #wiener{width:200px;height:200px;margin:20px auto;cursor:pointer;position:relative;}
-    #wiener img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 25px var(--purple));transition:0.2s;}
-    #wiener:active img{transform:scale(0.95);}
-    .actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:15px;}
-    .btn{background:linear-gradient(45deg,var(--purple),#9b59b6);color:#fff;border:none;padding:12px 20px;border-radius:20px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 5px 15px rgba(138,43,226,0.4);}
+    body{margin:0;background:#0a0a1a;color:#fff;font-family:'Comic Sans MS',sans-serif;overflow:hidden;position:relative;}
+    .page{display:none;position:absolute;top:0;left:0;width:100%;height:100%;padding:20px;box-sizing:border-box;overflow-y:auto;}
+    .page.active{display:block;}
+    h1{font-size:32px;text-align:center;margin:20px 0;text-shadow:0 0 20px #ffd700;}
+    h2{font-size:24px;text-align:center;margin:15px 0;}
+    #wiener-img{width:200px;height:200px;margin:20px auto;display:block;border-radius:50%;filter:drop-shadow(0 0 30px #ffd700);transition:transform 0.2s;cursor:pointer;}
+    #wiener-img:active {transform:scale(0.95) rotate(5deg);}
+    .stat{display:flex;justify-content:space-around;font-size:22px;margin:20px 0;background:rgba(255,215,0,0.1);padding:15px;border-radius:20px;}
+    .btn{background:linear-gradient(45deg,#ffd700,#ffed4a);color:#333;border:none;padding:15px 25px;border-radius:25px;font-size:18px;font-weight:bold;margin:10px;cursor:pointer;box-shadow:0 8px 20px rgba(255,215,0,0.4);transition:0.2s;}
+    .btn:active{transform:scale(0.98);}
     .btn:disabled{opacity:0.5;cursor:not-allowed;}
-    .shop{background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);margin:15px;padding:15px;border-radius:25px;border:1px solid rgba(138,43,226,0.3);}
-    .item{display:flex;justify-content:space-between;align-items:center;margin:10px 0;padding:10px;background:rgba(255,255,255,0.1);border-radius:15px;}
-    #leaderboard{position:fixed;top:0;right:-300px;width:280px;height:100%;background:rgba(0,0,0,0.9);padding:20px;overflow-y:auto;transition:0.3s;}
-    #leaderboard.open{right:0;}
-    #lbList{list-style:none;padding:0;}
-    #lbList li{padding:10px;margin:5px 0;background:rgba(138,43,226,0.2);border-radius:10px;font-size:14px;}
-    #particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
-    .particle{font-size:30px;animation:float 1.5s ease-out forwards;}
+    .shop-item{margin:20px 0;padding:20px;background:rgba(255,255,255,0.1);border-radius:20px;border:1px solid #ffd700;}
+    #referral-link{background:#333;color:#ffd700;padding:15px;border-radius:10px;font-size:16px;word-break:break-all;margin:10px 0;}
+    #points-earned{font-size:28px;color:#ffd700;text-shadow:0 0 10px #ffd700;}
+    #daily-streak{font-size:20px;color:#ff6b6b;}
+    .nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0;}
+    .mining{display:flex;justify-content:center;align-items:center;gap:10px;font-size:20px;color:#4ade80;}
+    .particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;}
+    .particle{font-size:40px;animation:float 1s ease-out forwards;}
     @keyframes float{to{transform:translateY(-100vh) rotate(360deg);opacity:0;}}
-    .daily{background:linear-gradient(45deg,#ff6b6b,#ffd93d);color:#000;padding:15px;border-radius:20px;margin:15px;font-weight:bold;box-shadow:0 0 25px rgba(255,107,107,0.6);}
+    .spin-wheel{width:200px;height:200px;margin:30px auto;background:conic-gradient(#ff6b6b 0% 33%, #ffd700 33% 66%, #4ade80 66% 100%);border-radius:50%;position:relative;animation:spin 3s linear infinite paused;box-shadow:0 0 30px #ffd700;}
+    @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    .spin-btn{margin-top:-100px;}
   </style>
 </head>
 <body>
-  <div class="stars" id="stars"></div>
-  <h1>🐶 WIENER DOGE 🐶</h1>
-  <div class="stats">
-    <div class="stat" id="points">Points: 0</div>
-    <div class="stat" id="level">Lvl 1</div>
-    <div class="stat" id="happy">Happy: 100%</div>
-  </div>
-  <div id="wiener" onclick="petWiener()">
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...[TRUNCATED - USE YOUR UPLOADED IMAGE URL INSTEAD]" alt="Wiener Doge" id="wienerImg">
-  </div>
-  <div id="particles"></div>
+  <div class="particles" id="particles"></div>
 
-  <div class="daily" id="dailyBtn">Daily Check-in: Claim 500 Points! 🐕</div>
-
-  <div class="actions">
-    <button class="btn" onclick="feedWiener()">🍖 Feed (+10 pts)</button>
-    <button class="btn" onclick="playWiener()">🎾 Play (+20 pts)</button>
-    <button class="btn" onclick="toggleLeaderboard()">🏆 Top 50</button>
-    <button class="btn" onclick="share()">📤 Share Wiener</button>
-  </div>
-
-  <div class="shop">
-    <h3>🛒 Wiener Shop</h3>
-    <div class="item">
-      <span>Auto-Feeder <span id="autoCount">0</span></span>
-      <button class="btn" id="buyAuto" onclick="buyAuto()">Cost: <span id="autoCost">50</span></button>
+  <!-- HOME PAGE -->
+  <div id="home" class="page active">
+    <h1>WIENER DOGE</h1>
+    <img src="https://i.ibb.co/4p4Y7hZ/wiener-cosmic-dachshund.png" id="wiener-img" onclick="tapWiener()">
+    <div class="stat">
+      <div>WIENER Points: <span id="points">0.0</span></div>
+      <div>Miners: <span id="miners">0</span></div>
     </div>
-    <div class="item">
-      <span>Golden Bone <span id="goldCount">0</span></span>
-      <button class="btn" id="buyGold" onclick="buyGold()">Cost: <span id="goldCost">200</span></button>
+    <div class="mining">
+      <span>Today's Mining: </span><span id="points-earned">0.0</span>
+    </div>
+    <div class="nav">
+      <button class="btn" onclick="showPage('daily')">Daily (+10)</button>
+      <button class="btn" onclick="showPage('refer')">Refer (+50)</button>
+      <button class="btn" onclick="showPage('shop')">Shop</button>
+      <button class="btn" onclick="showPage('spin')">Lucky Spin</button>
     </div>
   </div>
 
-  <div id="leaderboard">
-    <button class="btn" onclick="toggleLeaderboard()" style="float:right;">✕</button>
-    <h3>🏆 TOP 50 WIENER DOGES</h3>
-    <ul id="lbList"></ul>
-    <p>Your Rank: <span id="yourRank">--</span></p>
+  <!-- DAILY PAGE -->
+  <div id="daily" class="page">
+    <h1>Daily Check-in</h1>
+    <img src="https://i.ibb.co/4p4Y7hZ/wiener-cosmic-dachshund.png" style="width:150px;height:150px;border-radius:50%;">
+    <button class="btn" id="daily-btn" onclick="claimDaily()">Claim +10 Points!</button>
+    <div id="daily-streak">Streak: <span id="streak">0</span> days</div>
+    <button class="btn" onclick="showPage('home')">Back Home</button>
+  </div>
+
+  <!-- REFERRAL PAGE -->
+  <div id="refer" class="page">
+    <h1>Refer & Earn</h1>
+    <img src="https://i.ibb.co/4p4Y7hZ/wiener-cosmic-dachshund.png" style="width:150px;height:150px;border-radius:50%;">
+    <p>Share your link → +50 pts per friend!</p>
+    <div id="referral-link"></div>
+    <button class="btn" onclick="copyReferral()">Copy Link</button>
+    <button class="btn" onclick="shareReferral()">Share</button>
+    <button class="btn" onclick="showPage('home')">Back Home</button>
+  </div>
+
+  <!-- SHOP PAGE -->
+  <div id="shop" class="page">
+    <h1>Wiener Shop</h1>
+    <img src="https://i.ibb.co/4p4Y7hZ/wiener-cosmic-dachshund.png" style="width:120px;height:120px;border-radius:50%;">
+    <div class="shop-item">
+      <strong>Level 1 Wiener</strong> – 1000 pts → +50/day<br>
+      <button class="btn" onclick="buyMiner(1)">Buy (1000)</button>
+    </div>
+    <div class="shop-item">
+      <strong>Level 2 Wiener</strong> – 5000 pts → +100/day<br>
+      <button class="btn" onclick="buyMiner(2)">Buy (5000)</button>
+    </div>
+    <div class="shop-item">
+      <strong>Level 3 Wiener</strong> – 10,000 pts → +200/day<br>
+      <button class="btn" onclick="buyMiner(3)">Buy (10,000)</button>
+    </div>
+    <div class="shop-item">
+      <strong>Level 4 Wiener</strong> – 20,000 pts → +450/day<br>
+      <button class="btn" onclick="buyMiner(4)">Buy (20,000)</button>
+    </div>
+    <button class="btn" onclick="showPage('home')">Back Home</button>
+  </div>
+
+  <!-- LUCKY SPIN PAGE -->
+  <div id="spin" class="page">
+    <h1>Lucky Spin</h1>
+    <img src="https://i.ibb.co/4p4Y7hZ/wiener-cosmic-dachshund.png" style="width:120px;height:120px;border-radius:50%;">
+    <h2>Bet 100 Points → Win 0, 50, or 500!</h2>
+    <div class="spin-wheel" id="wheel"></div>
+    <button class="btn spin-btn" id="spin-btn" onclick="doSpin()">SPIN (100 pts)</button>
+    <div id="spin-result" style="font-size:24px;margin:20px;color:#ffd700;"></div>
+    <button class="btn" onclick="showPage('home')">Back Home</button>
   </div>
 
   <script>
     const tg = Telegram.WebApp;
     tg.ready(); tg.expand();
-    const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 'anon_' + Math.random().toString(36).substr(2, 9);
+    const userId = tg.initDataUnsafe.user?.id || 'guest_' + Date.now();
+    const botUsername = 'WienerClickerBot'; // CHANGE IF NEEDED
 
     let game = {
-      points: 0, totalPoints: 0, level: 1, happy: 100,
-      autoFeeders: 0, goldenBones: 0, autoCost: 50, goldCost: 200,
-      lastDaily: 0, lastUpdate: Date.now()
+      points: 0,
+      miners: {1:0, 2:0, 3:0, 4:0},
+      lastDaily: 0,
+      streak: 0,
+      lastMineDate: '',
+      referrals: 0
     };
 
-    // Supabase Leaderboard (FREE TIER)
-    const SUPABASE_URL = 'https://your-project.supabase.co'; // ← CREATE FREE ACCOUNT
-    const SUPABASE_KEY = 'your-anon-key'; // ← GET FROM SUPABASE
-    const supabase = { // Simple fetch wrapper
-      async upsertScore(score) {
-        await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: JSON.stringify({ user_id: userId, username: tg.initDataUnsafe.user?.username || 'Anonymous', score })
-        });
-      },
-      async getTop50() {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?order=score.desc&limit=50`, {
-          headers: { 'apikey': SUPABASE_KEY }
-        });
-        return await res.json();
-      }
-    };
-
-    // Elements
     const els = {
       points: document.getElementById('points'),
-      level: document.getElementById('level'),
-      happy: document.getElementById('happy'),
-      dailyBtn: document.getElementById('dailyBtn'),
-      autoBtn: document.getElementById('buyAuto'),
-      goldBtn: document.getElementById('buyGold'),
-      autoCost: document.getElementById('autoCost'),
-      goldCost: document.getElementById('goldCost'),
-      autoCount: document.getElementById('autoCount'),
-      goldCount: document.getElementById('goldCount'),
-      lbList: document.getElementById('lbList'),
-      yourRank: document.getElementById('yourRank')
+      miners: document.getElementById('miners'),
+      pointsEarned: document.getElementById('points-earned'),
+      dailyBtn: document.getElementById('daily-btn'),
+      streak: document.getElementById('streak'),
+      referralLink: document.getElementById('referral-link'),
+      spinBtn: document.getElementById('spin-btn'),
+      spinResult: document.getElementById('spin-result'),
+      wheel: document.getElementById('wheel')
     };
 
     // Load
-    tg.CloudStorage.getItem('wienerDoge', (err, data) => {
+    tg.CloudStorage.getItem('wienerDogeMiner', (err, data) => {
       if (data) game = JSON.parse(data);
-      update(); checkDaily(); loadLeaderboard(); createStars();
-      supabase.upsertScore(game.totalPoints);
+      update();
+      checkDaily();
+      updateReferralLink();
+      collectMining();
     });
 
-    function petWiener() {
-      const mult = 1 + game.goldenBones * 5;
-      const earn = Math.floor(Math.random() * 5 + 1) * mult;
-      game.points += earn; game.totalPoints += earn;
-      game.happy = Math.min(100, game.happy + 2);
-      createParticle('❤️');
+    function tapWiener() {
+      game.points += 0.1;
+      createParticle('✨');
       tg.HapticFeedback.impactOccurred('light');
       update(); save();
     }
 
-    function feedWiener() {
-      if (game.happy < 100) {
-        game.points += 10; game.happy = Math.min(100, game.happy + 15);
-        createParticle('🍖');
-        tg.HapticFeedback.impactOccurred('medium');
+    function buyMiner(level) {
+      const costs = {1:1000, 2:5000, 3:10000, 4:20000};
+      const cost = costs[level];
+      if (game.points >= cost) {
+        game.points -= cost;
+        game.miners[level]++;
+        update(); save();
       }
-      update(); save();
     }
 
-    function playWiener() {
-      game.points +=
+    function claimDaily() {
+      const today = new Date().toDateString();
+      if (game.lastDaily !== today) {
+        game.points += 10;
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        game.streak = (game.lastDaily === yesterday) ? game.streak + 1 : 1;
+        game.lastDaily = today;
+        els.dailyBtn.disabled = true;
+        els.dailyBtn.innerText = "Claimed!";
+        update(); save();
+      }
+    }
+
+    function checkDaily() {
+      const today = new Date().toDateString();
+      els.streak.innerText = game.streak;
+      if (game.lastDaily === today) {
+        els.dailyBtn.disabled = true;
+        els.dailyBtn.innerText = "Claimed Today!";
+      }
+    }
+
+    function collectMining() {
+      const today = new Date().toDateString();
+      if (game.lastMineDate !== today) {
+        const rates = {1:50, 2:100, 3:200, 4:450};
+        let earned = 0;
+        for (let lvl in game.miners) {
+          earned += game.miners[lvl] * rates[lvl];
+        }
+        game.points += earned;
+        game.lastMineDate = today;
+        els.pointsEarned.innerText = earned.toFixed(1);
+        save();
+      } else {
+        els.pointsEarned.innerText = '0.0';
+      }
+      update();
+    }
+
+    function updateReferralLink() {
+      const link = `https://t.me/${botUsername}?start=ref_${userId}`;
+      els.referralLink.innerText = link;
+    }
+
+    function copyReferral() {
+      navigator.clipboard.writeText(els.referralLink.innerText);
+      alert("Link copied!");
+    }
+
+    function shareReferral() {
+      tg.shareUrl(els.referralLink.innerText, "Join WIENER DOGE & earn points! 🐕");
+    }
+
+    function doSpin() {
+      if (game.points < 100) return alert("Not enough points!");
+      game.points -= 100;
+      els.spinBtn.disabled = true;
+      els.wheel.style.animationPlayState = 'running';
+
+      setTimeout(() => {
+        els.wheel.style.animationPlayState = 'paused';
+        const rand = Math.random();
+        let win = 0;
+        if (rand < 0.05) win = 500;        // 5% → 500
+        else if (rand < 0.20) win = 50;    // 15% → 50
+        else win = 0;                      // 80% → 0
+
+        game.points += win;
+        els.spinResult.innerText = win > 0 ? `You won ${win} points!` : "Better luck next time!";
+        els.spinBtn.disabled = false;
+        update(); save();
+      }, 3000);
+    }
+
+    function createParticle(emoji) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.innerText = emoji;
+      p.style.left = Math.random() * 80 + 10 + 'vw';
+      p.style.top = '70vh';
+      document.getElementById('particles').appendChild(p);
+      setTimeout(() => p.remove(), 1000);
+    }
+
+    function update() {
+      const totalMiners = Object.values(game.miners).reduce((a,b)=>a+b,0);
+      els.points.innerText = game.points.toFixed(1);
+      els.miners.innerText = totalMiners;
+    }
+
+    function save() {
+      tg.CloudStorage.setItem('wienerDogeMiner', JSON.stringify(game));
+    }
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id === 'home') collectMining();
+    }
+
+    // Auto-save
+    setInterval(save, 10000);
+    update();
+  </script>
+</body>
+  </html>
